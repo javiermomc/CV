@@ -17,6 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.videoio.VideoCapture;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamException;
@@ -30,8 +32,9 @@ public class WebcamFrame {
 	JLabel selectionLbl;
 	Point startPoint, endPoint;
 	public Rectangle area;
+	VideoCapture camera;
+	
 	public WebcamFrame(){
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		if(Webcam.getWebcams().size()>1){
 		System.out.println("Select a webcam:");
 		System.out.println(Webcam.getWebcams());
@@ -45,6 +48,7 @@ public class WebcamFrame {
 		webcam = Webcam.getWebcams().get(webcamPort);
 		}else webcam = Webcam.getDefault();
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
+		System.out.println(webcam.getViewSize());
 		startWebcam();
 		startWindow();
 		
@@ -115,6 +119,11 @@ public class WebcamFrame {
 	}
 	public BufferedImage getImage(){
 		return webcam.getImage();
+	}
+	public Mat getImageMat(){
+		Mat frame = new Mat();
+		camera.read(frame);
+		return frame;
 	}
 
 }

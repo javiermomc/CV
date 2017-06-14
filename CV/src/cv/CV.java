@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -29,15 +30,21 @@ public class CV implements Runnable{
 	ImageFrame filtredImgFrame, hsvFrame, frame;
 	Tools tools;
 	Mat object;
-	double wAp, hAp;
-	SimpleDateFormat time;
+	double wAp, hAp, oW=0, oH=0, oA=0, 
+	hFOV = 60,
+	vFOV = 40;
+	SimpleDateFormat systemTime;
+	Date actualTime = new Date();
+	String time;
 	Double[] hsvMin = {95.0,0.0,80.0}, hsvMax = {110.0, 40.0, 255.0};
 	double[] coordinates = {0,0};
 	
 	public CV(){
-		time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-		wAp = 60.0/640.0;
-		hAp = 40.0/480.0;
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		systemTime = new SimpleDateFormat("ss.SSS");
+		time = systemTime.format(actualTime);
+		wAp = 640.0/(2*Math.tan(hFOV/2)); 
+		hAp = 480.0/(2*Math.tan(vFOV/2));
 //		System.out.println(wAp);
 //		System.out.println(hAp);
 		webcam = new WebcamFrame();
@@ -54,7 +61,9 @@ public class CV implements Runnable{
 //				System.out.println(System.currentTimeMillis());
 				object=new Mat();
 				Mat img = bufferedImage2Mat(webcam.getImage());
-				time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//				Mat img = webcam.getImageMat();
+				actualTime = new Date();
+				time = systemTime.format(actualTime);
 				Mat hsv = img.clone();
 				Imgproc.cvtColor(hsv, hsv, Imgproc.COLOR_BGR2HSV);
 				hsvMin = tools.getMinValues();
@@ -75,10 +84,13 @@ public class CV implements Runnable{
 				}
 				if(object!=null&&object.width()>0&&object.height()>0){
 					coordinates = getCentroid(object);
-					Imgproc.circle(img, new Point(coordinates[0], coordinates[1]), 7, new Scalar(180,255,255), -1);
+					Imgproc.circle(img, new Point(coordinates[0], coordinates[1]), 7, new Scalar(0,100,50), -1);
 				}
 				else{ coordinates[0] = 0; coordinates[1] = 0;}
 				hsvFrame.update(img);
+				oH = object.height();
+				oW = object.width();
+				oA = oH*oW;
 			}
 			
 		}catch(Exception e){
@@ -86,11 +98,27 @@ public class CV implements Runnable{
 		}
 	}
 	
-	public String getX(){
-		return (double)Math.round((coordinates[0]-319.5)*wAp*1000)/1000+" Time: "+time.toString();
+	public double getX(){
+		return Math.atan((coordinates[0]-319.5)/wAp)*Math.PI*2;
 	}
-	public String getY(){
-		return (double)Math.round((coordinates[1]-239.5)*hAp*1000)/1000+" Time: "+time.toString();
+	public double getY(){
+		return Math.atan((coordinates[1]-239.5)/hAp)*Math.PI*2;
+	}
+	public double getXCoordinates(){
+		return coordinates[0];
+	}
+	public double getObjectLenght(){
+		return oA;		
+	}
+	public boolean getIfReady(){
+		if(oA<120||oA>95)return true;
+		else return false;
+	}
+	public double getYCoordinates(){
+		return coordinates[1];
+	}
+	public String getTime(){
+		return time;
 	}
 	public void setMinHSV(double h, double s, double v){hsvMin = new Double[]{h,s,v};}
 	public void setMaxHSV(double h, double s, double v){hsvMax = new Double[]{h,s,v};}
@@ -107,9 +135,13 @@ public class CV implements Runnable{
 	public double[] getCentroid(Mat img){
 		Moments moment = Imgproc.moments(img);
 		double moment10 = moment.m10, moment01 = moment.m01, moment00 = moment.m00;
-		double x = (int)moment10/moment00, y = (int)moment01/moment00;
+		double x = moment10/moment00, y = moment01/moment00;
 		if(moment10==0&&moment00==0)
 		System.out.println("Moments are 0!!!");
+		x= Math.round(x*1000);
+		x= x/1000;
+		y= Math.round(y*1000);
+		y= y/1000;
 		double[] coord = {x, y};
 		return coord;
 	}
