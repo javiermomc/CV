@@ -2,6 +2,7 @@ package cv;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,16 +20,16 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.opencv.videoio.VideoCapture;
 
 import GUI.ImageFrame;
 import GUI.Tools;
-import GUI.WebcamFrame;
 
 public class CV implements Runnable{
 	
-	WebcamFrame webcam;
-	ImageFrame filtredImgFrame, hsvFrame, frame;
-	Tools tools;
+//	WebcamFrame webcam;
+//	ImageFrame filtredImgFrame, hsvFrame, frame, webcamFrame;
+//	Tools tools;
 	Mat object;
 	double wAp, hAp, oW=0, oH=0, oA=0, 
 	hFOV = 60,
@@ -36,44 +37,54 @@ public class CV implements Runnable{
 	SimpleDateFormat systemTime;
 	Date actualTime = new Date();
 	String time;
-	Double[] hsvMin = {95.0,0.0,80.0}, hsvMax = {110.0, 40.0, 255.0};
+	Double[] hsvMin = {52.0,127.0,81.0}, hsvMax = {100.0, 255.0, 184.0};
 	double[] coordinates = {0,0};
 	
+	VideoCapture webcam;
+	
 	public CV(){
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		String libName = "";
+		if (System.getProperty("os.name").contains("Windows")) {
+		    libName = "opencv_java340.dll";
+		} else {
+		    libName = "libopencv_java400.so";
+		}
+		System.load(new File("./files/".concat(libName)).getAbsolutePath());
+		webcam = new VideoCapture(0);
 		systemTime = new SimpleDateFormat("ss.SSS");
 		time = systemTime.format(actualTime);
 		wAp = 640.0/(2*Math.tan(hFOV/2)); 
 		hAp = 480.0/(2*Math.tan(vFOV/2));
-//		System.out.println(wAp);
-//		System.out.println(hAp);
-		webcam = new WebcamFrame();
-		tools = new Tools(webcam.getCloseOperation());
-		filtredImgFrame = new ImageFrame("Filtered");
-		hsvFrame = new ImageFrame("Contours");
+//		webcamFrame = new ImageFrame("Webcam");
+//		tools = new Tools();
+//		filtredImgFrame = new ImageFrame("Filtered");
+//		hsvFrame = new ImageFrame("Contours");
 //		frame = new ImageFrame("Cropped");
 		object = new Mat();
 	}
 	@Override
 	public void run() {
 		try{
-			while(webcam.getCloseOperation()==3){
+			while(true){
 //				System.out.println(System.currentTimeMillis());
 				object=new Mat();
-				Mat img = bufferedImage2Mat(webcam.getImage());
+				Mat img = new Mat();
+				webcam.read(img);
+//				webcamFrame.update(img);
 //				Mat img = webcam.getImageMat();
 				actualTime = new Date();
 				time = systemTime.format(actualTime);
 				Mat hsv = img.clone();
 				Imgproc.cvtColor(hsv, hsv, Imgproc.COLOR_BGR2HSV);
-				hsvMin = tools.getMinValues();
-				hsvMax = tools.getMaxValues();				
+//				hsvMin = tools.getMinValues();
+//				hsvMax = tools.getMaxValues();				
+				
 				
 				Scalar min = new Scalar(hsvMin[0],hsvMin[1],hsvMin[2]), max = new Scalar(hsvMax[0],hsvMax[1],hsvMax[2]);
 				
 				Core.inRange(hsv, min, max, hsv); //Transforms the HSV image to get only the colors in range between the min and max values.
 				
-				filtredImgFrame.update(hsv); // Displays frame in Filtered window after filtered colors.
+//				filtredImgFrame.update(hsv); // Displays frame in Filtered window after filtered colors.
 				List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 				Imgproc.findContours(hsv, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 				Imgproc.drawContours(img, contours, -1, new Scalar(0,255,0), 3);
@@ -87,7 +98,7 @@ public class CV implements Runnable{
 					Imgproc.circle(img, new Point(coordinates[0], coordinates[1]), 7, new Scalar(0,100,50), -1);
 				}
 				else{ coordinates[0] = 0; coordinates[1] = 0;}
-				hsvFrame.update(img);
+//				hsvFrame.update(img);
 				oH = object.height();
 				oW = object.width();
 				oA = oH*oW;

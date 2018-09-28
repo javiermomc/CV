@@ -2,14 +2,15 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="D:/JavierJr/Documents/JavaLibs/bridj-0.6.2.jar"/>
+	<classpathentry kind="lib" path="D:/JavierJr/Documents/JavaLibs/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="D:/JavierJr/Documents/JavaLibs/slf4j-simple-1.7.25.jar"/>
+	<classpathentry kind="lib" path="D:/JavierJr/Documents/JavaLibs/webcam-capture-0.3.11.jar"/>
+	<classpathentry kind="var" path="open-cv"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenCV">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/javie/Documents/JavaLibs/opencv/build/java/x64"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="D:/JavierJr/Documents/JavaLibs/opencv/build/java/x64"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/javie/Documents/JavaLibs/bridj-0.6.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/javie/Documents/JavaLibs/slf4j-api-1.7.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/javie/Documents/JavaLibs/slf4j-simple-1.7.25.jar"/>
-	<classpathentry kind="lib" path="C:/Users/javie/Documents/JavaLibs/webcam-capture-0.3.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
