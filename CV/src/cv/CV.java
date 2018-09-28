@@ -24,6 +24,8 @@ import org.opencv.videoio.VideoCapture;
 
 import GUI.ImageFrame;
 import GUI.Tools;
+import GUI.WebcamFrame;
+
 
 public class CV implements Runnable{
 	
@@ -40,7 +42,7 @@ public class CV implements Runnable{
 	Double[] hsvMin = {52.0,127.0,81.0}, hsvMax = {100.0, 255.0, 184.0};
 	double[] coordinates = {0,0};
 	
-	VideoCapture webcam;
+	WebcamFrame webcam;
 	
 	public CV(){
 		String libName = "";
@@ -50,7 +52,7 @@ public class CV implements Runnable{
 		    libName = "libopencv_java400.so";
 		}
 		System.load(new File("./files/".concat(libName)).getAbsolutePath());
-		webcam = new VideoCapture(0);
+		webcam = new WebcamFrame();
 		systemTime = new SimpleDateFormat("ss.SSS");
 		time = systemTime.format(actualTime);
 		wAp = 640.0/(2*Math.tan(hFOV/2)); 
@@ -68,8 +70,8 @@ public class CV implements Runnable{
 			while(true){
 //				System.out.println(System.currentTimeMillis());
 				object=new Mat();
-				Mat img = new Mat();
-				webcam.read(img);
+				Mat img = bufferedImage2Mat(webcam.getImage());
+//				webcam.read(img);
 //				webcamFrame.update(img);
 //				Mat img = webcam.getImageMat();
 				actualTime = new Date();
