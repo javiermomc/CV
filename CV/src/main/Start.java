@@ -15,6 +15,7 @@ public class Start {
 	
 	public static void start(){
 		System.out.println("Created by Javier Mondragon Martin del Campo");
+		System.out.println("Created with Sarox webcam and OpenCV");
 		
 		runnable = new CV();
 		cv = new Thread(runnable);
